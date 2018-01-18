@@ -7,6 +7,7 @@ import logging
 import logging.handlers
 import sys
 import time
+import re
 
 from serial.serialutil import SerialException, portNotOpenError
 
@@ -117,8 +118,12 @@ class Serial(object):
 
         # Look up which data that should be waiting for subsequent read
         # commands.
-        self._waiting_data = self.ds_responses.get(
-            input_str, dummyserial.constants.NO_DATA_PRESENT)
+        result = dummyserial.constants.NO_DATA_PRESENT
+        for key, item in self.ds_responses.items():
+                if re.match(key, input_str):
+                    result = item
+                    break
+        self._waiting_data = result
 
     def read(self, size=1):
         """
@@ -184,6 +189,9 @@ class Serial(object):
             return bytes(return_str, encoding='latin1')
         else:
             return return_str
+
+    def readline():
+        pass
 
     def out_waiting(self):  # pylint: disable=C0103
         """Returns length of waiting output data."""
