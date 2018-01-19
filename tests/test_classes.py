@@ -91,7 +91,7 @@ class DummySerialTest(unittest.TestCase):  # pylint: disable=R0904
         ds_instance = dummyserial.Serial(
             port=self.random_serial_port,
             baudrate=self.random_baudrate,
-            ds_responses={"ABCDE .*": rand_write_str2}
+            ds_responses={"ABCDE .+?": rand_write_str2}
         )
 
         ds_instance.write(rand_write_str1.encode())
@@ -104,6 +104,28 @@ class DummySerialTest(unittest.TestCase):  # pylint: disable=R0904
                 break
 
         self.assertEqual(read_data, rand_write_str2)
+
+    def test_write_and_readline(self):
+        """Tests writing-to and reading-from a Dummy Serial port."""
+        rand_write_len1 = random.randint(0, 1024)
+        rand_write_len2 = random.randint(0, 1024)
+        rand_write_len3 = random.randint(0, 1024)
+
+        rand_write_str1 = self.random(rand_write_len1)
+        rand_write_str2 = self.random(rand_write_len2)
+        rand_write_str3 = self.random(rand_write_len3)
+
+        ds_instance = dummyserial.Serial(
+            port=self.random_serial_port,
+            baudrate=self.random_baudrate,
+            ds_responses={rand_write_str1: rand_write_str2 + '\n' + rand_write_str3}
+        )
+
+        ds_instance.write(rand_write_str1.encode())
+
+        read_data = ds_instance.readline().decode()
+
+        self.assertEqual(read_data, rand_write_str1)
 
     def test_write_closed_port(self):
         """Tests writing-to a closed Dummy Serial port."""
