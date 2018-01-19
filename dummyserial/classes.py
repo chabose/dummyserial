@@ -119,7 +119,8 @@ class Serial(object):
         # Look up which data that should be waiting for subsequent read
         # commands.
         result = dummyserial.constants.NO_DATA_PRESENT
-        for key, item in self.ds_responses.items():
+        print("keys:"+self.ds_responses.keys())
+        for key in self.ds_responses.keys():
                 if re.match(key, input_str):
                     result = item
                     break

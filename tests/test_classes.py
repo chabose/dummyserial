@@ -81,6 +81,30 @@ class DummySerialTest(unittest.TestCase):  # pylint: disable=R0904
 
         self.assertEqual(read_data, rand_write_str2)
 
+    def test_regexwrite_and_read(self):
+        """Tests writing-to and reading-from a Dummy Serial port."""
+        rand_write_len1 = random.randint(0, 1024)
+        rand_write_len2 = random.randint(0, 1024)
+        rand_write_str1 = "ABCDE hoge"
+        rand_write_str2 = "OK"
+
+        ds_instance = dummyserial.Serial(
+            port=self.random_serial_port,
+            baudrate=self.random_baudrate,
+            ds_responses={"ABCDE .*": rand_write_str2}
+        )
+
+        ds_instance.write(rand_write_str1.encode())
+
+        read_data = ''
+        while 1:
+            read_data = ''.join([read_data, ds_instance.read(rand_write_len2).decode()])
+            waiting_data = ds_instance.outWaiting()
+            if not waiting_data:
+                break
+
+        self.assertEqual(read_data, rand_write_str2)
+
     def test_write_closed_port(self):
         """Tests writing-to a closed Dummy Serial port."""
         rand_write_len1 = random.randint(0, 1024)
